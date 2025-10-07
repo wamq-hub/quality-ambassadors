@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة سفراء الجودة - TVTC</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p>جاري التحميل...</p>
+    </div>
+
+    <!-- Welcome Screen -->
+    <div id="welcomeScreen" class="screen active">
+        <div class="welcome-container">
+            <div class="welcome-card">
+                <div class="icon-badge">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h1 class="main-title">مبادرة سفراء الجودة</h1>
+                <p class="subtitle">المؤسسة العامة للتدريب التقني والمهني</p>
+                <p class="description">نرحب بك في منصة التسجيل والمتابعة</p>
+                
+                <div class="info-box">
+                    <p>كن جزءاً من رحلة التميز والجودة. سجّل الآن وشارك في صناعة مستقبل أفضل لمؤسستك ومجتمعك.</p>
+                </div>
+
+                <button onclick="startRegistration()" class="btn-primary btn-large">
+                    ابدأ التسجيل
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+
+                <button onclick="showAdminLogin()" class="btn-secondary btn-small">
+                    <i class="fas fa-shield-alt"></i>
+                    دخول المشرف
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Screen -->
+    <div id="registrationScreen" class="screen">
+        <div class="container">
+            <!-- Progress Bar -->
+            <div id="progressBar" class="progress-container">
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <p class="progress-text"><span id="progressPercent">0</span>% مكتمل</p>
+            </div>
+
+            <!-- Registration Card -->
+            <div class="registration-card">
+                <!-- Step 1: Student ID -->
+                <div id="step1" class="registration-step active">
+                    <h2 class="step-title">الخطوة 1: الرقم التدريبي</h2>
+                    <p class="step-description">أدخل رقمك التدريبي للمتابعة</p>
+
+                    <div class="form-group">
+                        <label for="studentId">الرقم التدريبي</label>
+                        <input type="text" id="studentId" placeholder="مثال: 2001" class="form-input">
+                    </div>
+
+                    <div id="errorMessage" class="error-message hidden">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="errorText"></span>
+                    </div>
+
+                    <button onclick="searchStudent()" class="btn-primary">
+                        البحث والمتابعة
+                    </button>
+
+                    <p class="hint-text">للتجربة: استخدم أحد الأرقام (2001، 2002، 2003، 2004، 2005)</p>
+                </div>
+
+                <!-- Step 2: Confirm Data + Telegram -->
+                <div id="step2" class="registration-step">
+                    <h2 class="step-title">الخطوة 2: تأكيد البيانات</h2>
+                    <p class="step-description">تحقق من بياناتك وأضف حساب تليجرام</p>
+
+                    <div class="data-display">
+                        <div class="data-row">
+                            <label>الاسم</label>
+                            <p id="displayName"></p>
+                        </div>
+                        <div class="data-row">
+                            <label>الرقم التدريبي</label>
+                            <p id="displayId"></p>
+                        </div>
+                        <div class="data-row">
+                            <label>القسم</label>
+                            <p id="displayDepartment"></p>
+                        </div>
+                        <div class="data-row">
+                            <label>التخصص</label>
+                            <p id="displaySpecialization"></p>
+                        </div>
+                        <div class="data-row">
+                            <label>المستوى التدريبي</label>
+                            <p id="displayLevel"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telegram">حساب تليجرام</label>
+                        <input type="text" id="telegram" placeholder="@username" class="form-input" dir="ltr">
+                    </div>
+
+                    <div id="errorMessage2" class="error-message hidden">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="errorText2"></span>
+                    </div>
+
+                    <button onclick="submitRegistration()" class="btn-primary">
+                        تسجيل
+                    </button>
+                </div>
+
+                <!-- Step 3: Success -->
+                <div id="step3" class="registration-step">
+                    <div class="success-container">
+                        <div class="success-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h2 class="success-title">✅ أنت الآن ضمن سفراء الجودة</h2>
+                        <p class="success-subtitle">مرحباً بك <span id="successName"></span></p>
+                        <p class="success-description">تم ربط حسابك بنجاح</p>
+
+                        <div class="resources-section">
+                            <h3>الملفات والموارد</h3>
+                            <button class="btn-resource" onclick="downloadFile('presentation')">
+                                <i class="fas fa-download"></i>
+                                تحميل عرض المبادرة
+                            </button>
+                            <button class="btn-resource" onclick="downloadFile('phrases')">
+                                <i class="fas fa-file-alt"></i>
+                                تحميل العبارات المعتمدة
+                            </button>
+                        </div>
+
+                        <button onclick="viewTasks()" class="btn-primary btn-large">
+                            عرض مهامي
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Dashboard -->
+    <div id="studentDashboard" class="screen">
+        <div class="container">
+            <!-- Header -->
+            <div class="dashboard-header">
+                <div class="header-content">
+                    <div class="user-info">
+                        <h1>مهامي</h1>
+                        <p>مرحباً <span id="dashboardName"></span></p>
+                        <p class="user-details">
+                            <span id="dashboardDept"></span> - المستوى <span id="dashboardLevel"></span>
+                        </p>
+                    </div>
+                    <div class="header-actions">
+                        <button onclick="showNotifications()" class="btn-icon">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </button>
+                        <button onclick="logout()" class="btn-secondary btn-small">
+                            <i class="fas fa-sign-out-alt"></i>
+                            تسجيل خروج
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalTasks">0</h3>
+                        <p>إجمالي المهام</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-check-double"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="completedTasks">0</h3>
+                        <p>المهام المنجزة</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon yellow">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="pendingTasks">0</h3>
+                        <p>بانتظار التقييم</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="remainingTasks">0</h3>
+                        <p>المهام المتبقية</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks List -->
+            <div class="tasks-section">
+                <h2 class="section-title">
+                    <i class="fas fa-list-check"></i>
+                    المهام المخصصة لك
+                </h2>
+                <div id="tasksList" class="tasks-list">
+                    <!-- Tasks will be loaded here dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="screen">
+        <div class="container">
+            <div class="dashboard-header">
+                <div class="header-content">
+                    <div class="user-info">
+                        <h1><i class="fas fa-shield-alt"></i> لوحة تحكم المشرف</h1>
+                        <p>إدارة ومتابعة سفراء الجودة</p>
+                    </div>
+                    <button onclick="logout()" class="btn-secondary btn-small">
+                        <i class="fas fa-sign-out-alt"></i>
+                        تسجيل خروج
+                    </button>
+                </div>
+            </div>
+
+            <!-- Admin Tabs -->
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="showAdminTab('overview')">
+                    <i class="fas fa-chart-line"></i>
+                    نظرة عامة
+                </button>
+                <button class="tab-btn" onclick="showAdminTab('students')">
+                    <i class="fas fa-users"></i>
+                    المتدربين
+                </button>
+                <button class="tab-btn" onclick="showAdminTab('submissions')">
+                    <i class="fas fa-file-upload"></i>
+                    الشواهد المرفوعة
+                </button>
+            </div>
+
+            <!-- Admin Content -->
+            <div id="adminContent">
+                <!-- Will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+        <!-- نافذة الرفع -->
+        <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeUploadModal()">×</button>
+
+            <h3>رفع شاهد لمهمة: <span id="modalTaskTitle">—</span></h3>
+            <p class="hint">يمكنك رفع ملف مباشرة، أو استخدام رابط خارجي.</p>
+
+            <!-- اختيار ملف (المطلوب لأجل الرفع إلى درايف) -->
+            <label class="field-label">اختر ملف الشاهد</label>
+            <input
+            type="file"
+            id="evidenceFile"
+            accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" />
+
+            <!-- أو… إبقاء خيار الرابط القديم (اختياري) -->
+            <label class="field-label">أو الصق رابط الملف (اختياري)</label>
+            <input
+            type="url"
+            id="fileUrl"
+            placeholder="https://example.com/file.pdf" />
+
+            <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeUploadModal()">إلغاء</button>
+            <button class="btn-primary" onclick="submitEvidence()">رفع الشاهد</button>
+            </div>
+        </div>
+        </div>
+
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ⚠️ مهم جداً: ترتيب تحميل الملفات -->
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
