@@ -37,37 +37,16 @@ const CONFIG = {
         }
     },
     
-    // ===== إعدادات Telegram Bot =====
-    TELEGRAM: {
-        // توكن البوت من BotFather
-        BOT_TOKEN: 'YOUR_BOT_TOKEN_HERE',
-        
-        // معرف قناة/مجموعة المشرفين (اختياري)
-        ADMIN_CHAT_ID: '',
-        
-        // رابط البوت (للمستخدمين)
-        BOT_URL: 'https://t.me/YOUR_BOT_USERNAME'
-    },
-    
-    // ===== إعدادات n8n =====
-    N8N: {
-        // رابط webhook الخاص بـ n8n
-        WEBHOOK_URL: 'https://your-n8n-instance.com/webhook/quality-ambassadors',
-        
-        // مفتاح الحماية (اختياري)
-        WEBHOOK_SECRET: ''
-    },
-    
     // ===== إعدادات التطبيق =====
     APP: {
         // اسم المؤسسة
-        ORGANIZATION_NAME: 'الكلية التقنية بالرياض',
+        ORGANIZATION_NAME: 'الكلية التقنية بحقل',
         
         // اسم المبادرة
         INITIATIVE_NAME: 'سفراء الجودة',
         
         // البريد الإلكتروني للدعم
-        SUPPORT_EMAIL: 'quality@tvtc.gov.sa',
+        SUPPORT_EMAIL: 'fahadsaleh@tvtc.gov.sa',
         
         // رابط المنصة
         PLATFORM_URL: 'https://your-platform-url.com',
@@ -79,10 +58,22 @@ const CONFIG = {
         ENVIRONMENT: 'development'
     },
     
+    // ===== حساب الدعم =====
+    SUPPORT: {
+        // اسم مسؤول الدعم
+        ADMIN_NAME: 'وكيل ضبط الجودة - الكلية التقنية بحقل',
+        
+        // حساب التليجرام
+        TELEGRAM_ACCOUNT: 'https://t.me/EngFahadSaleh',
+        
+        // البريد الإلكتروني
+        EMAIL: 'fahadsaleh@tvtc.gov.sa'
+    },
+    
     // ===== إعدادات الإشعارات =====
     NOTIFICATIONS: {
         // تفعيل إشعارات التليجرام
-        TELEGRAM_ENABLED: true,
+        TELEGRAM_ENABLED: false,
         
         // تفعيل إشعارات البريد الإلكتروني
         EMAIL_ENABLED: false,
@@ -193,11 +184,10 @@ const CONFIG = {
     
     // ===== روابط الموارد =====
     RESOURCES: {
-        // رابط عرض المبادرة
-        PRESENTATION_URL: 'https://drive.google.com/file/d/YOUR_FILE_ID/view',
+        // رابط عرض المبادرة (PDF)
+        PRESENTATION_URL: 'https://mttvtcedu-my.sharepoint.com/:b:/g/personal/fahadsaleh_tvtc_gov_sa/EXqV00eJ6QNKobcBBG2fHoMBbiWpXND0KXUKpBG15fmqiw?e=7TEG2R',
         
-        // رابط ملف العبارات المعتمدة
-        PHRASES_URL: 'https://drive.google.com/file/d/YOUR_FILE_ID/view',
+        // ملاحظة: تم حذف رابط العبارات المعتمدة - يستخدم فقط رابط عرض المبادرة
         
         // رابط دليل المستخدم
         USER_GUIDE_URL: 'https://drive.google.com/file/d/YOUR_FILE_ID/view',
