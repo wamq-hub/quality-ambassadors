@@ -11,7 +11,6 @@ let currentTaskId = null;
 
 // ===== عند تحميل الصفحة =====
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🚀 تم تحميل المنصة');
   checkSession();     // التحقق من وجود جلسة مسبقة
   testConnection();   // فحص الاتصال بـ Google Apps Script
 });
@@ -134,15 +133,11 @@ function apiPost(action, payload = {}) {
 async function testConnection() {
   try {
     const res = await apiGet({ action: 'test' });
-    if (res.success) {
-      console.log('✅ الاتصال ناجح مع Google Apps Script');
-    } else {
-      console.error('❌ فشل الاتصال:', res.message);
-      showToast('خطأ في الاتصال بالخادم', 'error');
+    if (!res.success) {
+      showToast('تحذير: فشل الاتصال بالخادم', 'warning');
     }
   } catch (e) {
-    console.error('❌ خطأ في الاتصال:', e);
-    showToast('تعذر الاتصال بالخادم. تحقق من رابط Web App', 'error');
+    showToast('تحذير: تعذر الاتصال بالخادم', 'warning');
   }
 }
 
@@ -182,7 +177,7 @@ async function searchStudent() {
         showToast('تم العثور على بياناتك — أكمل تسجيل حساب التليجرام', 'info');
       }
     } else {
-      showError('errorMessage', 'errorText', res.message || 'لم يتم العثور على الرقم التدريبي');
+      showError('errorMessage', 'errorText', 'عذراً، لم نجد بياناتك في نظام مبادرة سفراء الجودة. المتدربين المسجلين فقط يسمح لهم بالدخول. يرجى التواصل مع وكيل ضبط الجودة للتسجيل.');
     }
   } catch (e) {
     hideLoading();
@@ -254,9 +249,6 @@ async function viewTasks() {
   try {
     const res = await apiGet({ action: 'getStudentTasks', studentId: currentStudent.id });
 
-    // لوج للتشخيص داخل الدالة فقط
-    console.log('raw tasks payload:', res.data, Array.isArray(res.data) ? 'array' : typeof res.data);
-
     if (!res.success) throw new Error(res.message || 'تعذر جلب المهام');
 
     currentStudent.tasks = normalizeTasksResponse(res.data);
@@ -323,17 +315,17 @@ function displayTasks() {
     return;
   }
 
-  tasks.forEach(task => {
+  tasks.forEach((task, index) => {
     const submission = (currentStudent.submissions || []).find(s => String(s.taskId) == String(task.id));
-    const card = createTaskCard(task, submission);
+    const card = createTaskCard(task, submission, index);
     tasksList.appendChild(card);
   });
 }
 
-/* ===== إنشاء بطاقة مهمة ===== */
-function createTaskCard(task, submission) {
+/* ===== إنشاء بطاقة مهمة Accordion ===== */
+function createTaskCard(task, submission, index) {
   const div = document.createElement('div');
-  div.className = 'task-card';
+  div.className = 'task-card accordion-item';
 
   let statusBadge = '';
   if (submission) {
@@ -345,16 +337,24 @@ function createTaskCard(task, submission) {
   }
 
   div.innerHTML = `
-    <div class="task-header">
-      <h3 class="task-title"></h3>
+    <div class="accordion-header" onclick="toggleAccordion(this)">
+      <div class="accordion-title-section">
+        <i class="fas fa-chevron-down accordion-icon"></i>
+        <h3 class="task-title"></h3>
+      </div>
       ${statusBadge}
     </div>
-    <div class="task-details">
-      <p><i class="fas fa-tag"></i> ${task.type || '-'}</p>
-      <p><i class="fas fa-calendar"></i> الموعد: ${task.deadline || '-'}</p>
+    <div class="accordion-body">
+      <div class="task-details">
+        <p><i class="fas fa-tag"></i> <strong>النوع:</strong> ${task.type || '-'}</p>
+        <p><i class="fas fa-calendar"></i> <strong>الموعد:</strong> ${task.deadline || '-'}</p>
+      </div>
+      <div class="task-description-section">
+        <h4>الوصف:</h4>
+        <p class="task-description"></p>
+      </div>
+      <div class="task-actions"></div>
     </div>
-    <p class="task-description"></p>
-    <div class="task-actions"></div>
   `;
 
   // أدخل النصوص بأمان
@@ -382,6 +382,32 @@ function createTaskCard(task, submission) {
   return div;
 }
 
+/* ===== دالة تبديل Accordion ===== */
+function toggleAccordion(header) {
+  const item = header.parentElement;
+  const body = item.querySelector('.accordion-body');
+  const icon = header.querySelector('.accordion-icon');
+  
+  // إغلاق جميع الـ accordions الأخرى
+  document.querySelectorAll('.accordion-item').forEach(el => {
+    if (el !== item) {
+      el.classList.remove('active');
+      el.querySelector('.accordion-body').style.maxHeight = '0';
+      el.querySelector('.accordion-icon').style.transform = 'rotate(0deg)';
+    }
+  });
+  
+  // تبديل الـ accordion الحالي
+  item.classList.toggle('active');
+  
+  if (item.classList.contains('active')) {
+    body.style.maxHeight = body.scrollHeight + 'px';
+    icon.style.transform = 'rotate(-180deg)';
+  } else {
+    body.style.maxHeight = '0';
+    icon.style.transform = 'rotate(0deg)';
+  }
+}
 
 /* ===== نافذة الرفع ===== */
 function openUploadModal(taskId, taskTitle) {
@@ -692,8 +718,20 @@ async function loadStudents() {
     });
 
     container.innerHTML = '';
-    container.appendChild(search);
-    container.appendChild(table);
+    
+    // إنشاء وعاء للجدول بخلفية بيضاء نظيفة
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = `
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      overflow-x: auto;
+    `;
+    
+    wrapper.appendChild(search);
+    wrapper.appendChild(table);
+    container.appendChild(wrapper);
 
   } catch (e) {
     console.error('loadStudents error:', e);
@@ -776,7 +814,19 @@ async function loadSubmissionsForAdmin() {
     });
 
     container.innerHTML = '';
-    container.appendChild(table);
+    
+    // إنشاء وعاء للجدول بخلفية بيضاء نظيفة
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = `
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      overflow-x: auto;
+    `;
+    
+    wrapper.appendChild(table);
+    container.appendChild(wrapper);
 
   } catch (e) {
     console.error('loadSubmissionsForAdmin error:', e);
@@ -798,9 +848,4 @@ async function updateSubmissionStatus(id, status, notes='') {
     console.error('updateSubmissionStatus error:', e);
     showToast('حدث خطأ أثناء التحديث', 'error');
   }
-}
-
-
-function showNotifications() {
-  showToast('لا توجد إشعارات جديدة', 'info');
 }
