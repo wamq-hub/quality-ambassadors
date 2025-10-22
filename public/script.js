@@ -244,20 +244,27 @@ async function submitRegistration() {
 }
 
 /* ===== عرض المهام ===== */
+
 async function viewTasks() {
   showLoading();
   try {
-    const res = await apiGet({ action: 'getStudentTasks', studentId: currentStudent.id });
-
-    if (!res.success) throw new Error(res.message || 'تعذر جلب المهام');
-
-    currentStudent.tasks = normalizeTasksResponse(res.data);
+    // بعد نجاح التسجيل نعرض لوحة الطالب…
     hideScreen('registrationScreen');
     showScreen('studentDashboard');
+
+    // 1) تعبئة الهيدر فورًا (مرحباً + القسم + المستوى)
+    document.getElementById('dashboardName').textContent  = currentStudent?.name || '';
+    document.getElementById('dashboardDept').textContent  = currentStudent?.department || '';
+    document.getElementById('dashboardLevel').textContent = currentStudent?.level || '';
+
+    // 2) تحميل المهام + الشواهد وتحديث الكروت والإحصائيات
+    const tasksRes = await apiGet({ action: 'getStudentTasks', studentId: currentStudent.id });
+    currentStudent.tasks = tasksRes.success ? normalizeTasksResponse(tasksRes.data) : [];
 
     await loadSubmissions(currentStudent.id);
     displayTasks();
     updateStats();
+
   } catch (e) {
     console.error(e);
     showToast('خطأ في تحميل المهام', 'error');
@@ -265,6 +272,7 @@ async function viewTasks() {
     hideLoading();
   }
 }
+
 
 /* ===== تحميل لوحة التحكم ===== */
 async function loadDashboard() {
